@@ -1,56 +1,82 @@
-/*
- * @(#)Main.java
- *
- * Copyright Swiss Reinsurance Company, Mythenquai 50/60, CH 8022 Zurich. All rights reserved.
- */
 
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 public class Main {
 
-   private static final char badSimb[] = {'>', '<', '\"'};
+    private static final char badSimb[] = {'>', '<', '\"'};
+    private DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
 
     public static void main(String... argv) {
         new Main();
     }
 
+    public Main() {
+        Workout workout = new Workout();
+        readGpxFile(workout, "data\\onlyCord.gpx");
+        readHrmFile(workout, "data\\2012\\12013002.hrm");
+    }
 
-    /*
-           <trkpt lat="26.89257" lon="-82.244476">
-               <ele>3.99897599392</ele>
-               <time>2011-11-04T15:19:46Z</time>
-           </trkpt>
+    public void readHrmFile(Workout workout, String fileName){
 
-    */
-    Main() {
+
+
+    }
+
+
+
+
+    public void readGpxFile(Workout workout, String fileName){
         try {
-            BufferedReader reader = new BufferedReader(new FileReader("data\\onlyCord.gpx"));
+            BufferedReader reader = new BufferedReader(new FileReader(fileName));
             String readString;
+
             while ((readString = reader.readLine()) != null) {
                 readString = readString.trim();
                 if (readString.startsWith("<trkpt")){
-                    System.out.println( getCleanVal(getValue(readString, "lat")));
-                    System.out.println( getCleanVal(getValue(readString, "lon")));
+                    Coordinate cordinate = new Coordinate();
+                    cordinate.setLatitude(getCleanVal(getAtribValue(readString, "lat")));
+                    cordinate.setLongitude(getCleanVal(getAtribValue(readString, "lon")));
 
-                    readString = readString.trim();
+                    readString = reader.readLine().trim();
+                    Double val = Double.valueOf(getTagVal(readString, "ele"));
+                    cordinate.setElevation(val);
 
+                    readString = reader.readLine().trim();
+                    String timestampStr = getTagVal(readString, "time");
+                    Date dt = df.parse(timestampStr);
+                    cordinate.setTimeStamp(dt);
+
+                    if (cordinate.isOk())
+                        workout.addCoordinate(cordinate);
                 }
-
-
             }
+            workout.sort();
+            workout.print();
 
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
+        } catch (ParseException e) {
+            e.printStackTrace();
         }
     }
 
+    public String getTagVal(String orgStr, String readTagName){
+        String rezStr = orgStr.trim();
+        rezStr = rezStr.replaceAll("<"+ readTagName +">", "");
+        rezStr = rezStr.replaceAll("</"+ readTagName +">", "");
+        return rezStr.trim();
+    }
 
-    public String getValue(String readStr, String key) {
+    public String getAtribValue(String readStr, String key) {
         readStr = readStr.trim();
         for (String splitBySpace : readStr.trim().split(" ")){
             String splitByEqual[] =  splitBySpace.trim().split("=");
@@ -62,7 +88,6 @@ public class Main {
         return null;
     }
     public String getCleanVal(String val){
-
         Boolean containBadSimb = Boolean.FALSE;
         String endStr = "";
         for (char ch : val.toCharArray()){
@@ -76,7 +101,5 @@ public class Main {
         }
         return endStr;
     }
-
-
 }
 
