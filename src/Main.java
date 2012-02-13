@@ -2,8 +2,10 @@
 import com.sun.corba.se.impl.protocol.BootstrapServerRequestDispatcher;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.text.DateFormat;
 import java.text.ParseException;
@@ -26,16 +28,22 @@ public class Main {
 
     public Main() {
 
-
         Workout workout = new Workout();
         readGpxFile(workout, "data\\onlyCord.gpx");
         readHrmFile(workout, "data\\2012\\12013001.hrm");
-        workout.print();
         workout.normalize();
-        workout.print();
 
         StringBuffer sb = workout.generateGpxFileWithHrm();
-        System.out.println(sb);
+
+        try{
+            BufferedWriter writer = new BufferedWriter(new FileWriter("out.gpx"));
+            writer.write(sb.toString());
+            writer.close();
+
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+
     }
 
     public void readHrmFile(Workout workout, String fileName){

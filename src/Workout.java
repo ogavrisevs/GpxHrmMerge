@@ -49,6 +49,8 @@ public class Workout {
 
         StringBuffer sb = new StringBuffer();
         Integer hrKeyKey = 0;
+        addGpxHeader(sb);
+
         for(Coordinate  coordinate : coordinateList){
              hrKeyKey++;
 
@@ -95,8 +97,45 @@ public class Workout {
             sb.append(LINE_END);
 
         }
+
+        addGpxFooter(sb);
         return  sb;
     }
+
+    public void addGpxHeader(StringBuffer sb){
+
+        sb.append("<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\" ?> ");
+        sb.append("<gpx xmlns=\"http://www.topografix.com/GPX/1/1\" ");
+        sb.append("xmlns:gpxx=\"http://www.garmin.com/xmlschemas/WaypointExtension/v1\"");
+        sb.append("xmlns:gpxtrx=\"http://www.garmin.com/xmlschemas/GpxExtensions/v3\"");
+        sb.append("xmlns:gpxtpx=\"http://www.garmin.com/xmlschemas/TrackPointExtension/v1\"");
+        sb.append("creator=\"Oregon 550t\" version=\"1.1\"");
+        sb.append("xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"");
+        sb.append("xsi:schemaLocation=\"http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd http://www.garmin.com/xmlschemas/WaypointExtension/v1 http://www8.garmin.com/xmlschemas/WaypointExtensionv1.xsd http://www.garmin.com/xmlschemas/TrackPointExtension/v1 http://www.garmin.com/xmlschemas/TrackPointExtensionv1.xsd\">");
+        sb.append("<metadata>");
+        sb.append("<link href=\"http://www.garmin.com\">");
+        sb.append("<text>Garmin International</text>");
+        sb.append("</link>");
+        sb.append("<time>2012-01-01T19:08:38Z</time>");
+        sb.append("</metadata>");
+        sb.append("<trk>");
+        sb.append("<name>01-JAN-12 20:08:34</name>");
+        sb.append("<extensions>");
+        sb.append("<gpxtrx:TrackExtension>");
+        sb.append("<gpxtrx:DisplayColor>Black</gpxtrx:DisplayColor>");
+        sb.append("</gpxtrx:TrackExtension>");
+        sb.append("</extensions>");
+        sb.append("<trkseg>");
+
+    }
+
+    public void addGpxFooter(StringBuffer sb){
+        sb.append("</trkseg>");
+        sb.append("</trk>");
+        sb.append("</gpx>");
+    }
+
+
 
 
     public void addPulse(Integer pulse) {
@@ -115,5 +154,8 @@ public class Workout {
     public void setCoordinateList(List<Coordinate> coordinateList) {
         this.coordinateList = coordinateList;
     }
+
+
+
 }
 

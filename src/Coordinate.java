@@ -1,9 +1,3 @@
-/*
- * @(#)coordinate.java
- *
- * Copyright Swiss Reinsurance Company, Mythenquai 50/60, CH 8022 Zurich. All rights reserved.
- */
-
 import java.util.Date;
 
 public class Coordinate implements  Comparable<Coordinate> {
