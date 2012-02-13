@@ -48,8 +48,10 @@ public class Workout {
     public StringBuffer generateGpxFileWithHrm(){
 
         StringBuffer sb = new StringBuffer();
-        Integer hrKeyKey = 1;
+        Integer hrKeyKey = 0;
         for(Coordinate  coordinate : coordinateList){
+             hrKeyKey++;
+
             while(!hrData.containsKey(hrKeyKey))
                 hrKeyKey++;
 
