@@ -1,13 +1,27 @@
+package com.bla.laa.server;
+
+import java.io.BufferedReader;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
+import java.text.DateFormat;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.logging.Logger;
 
 public class Workout {
-    private static final String LINE_END = "\n";
-    SimpleDateFormat formatter = new SimpleDateFormat(Main.TIME_STAMP_FORMAT);
+    private static final Logger logger = Logger.getLogger(Workout.class.getName());
 
-    List<Coordinate> coordinateList = new ArrayList<Coordinate>();
-    Map<Integer, Integer> hrData = new HashMap<Integer, Integer>();
-    static Integer index = 1;
+    private static final String LINE_END = "\n";
+    SimpleDateFormat formatter = new SimpleDateFormat(TIME_STAMP_FORMAT);
+    private static final char badSimb[] = {'>', '<', '\"'};
+    public static final String TIME_STAMP_FORMAT = "yyyy-MM-dd'T'HH:mm:ss'Z'";
+    private DateFormat df = new SimpleDateFormat(TIME_STAMP_FORMAT);
+
+    private List<Coordinate> coordinateList = new ArrayList<Coordinate>();
+    private Map<Integer, Integer> hrData = new HashMap<Integer, Integer>();
+    private static Integer index = 1;
 
 
     public void sort(){
@@ -15,19 +29,22 @@ public class Workout {
     }
 
     public void print(){
-        System.out.println("coordinateList("+ coordinateList.size()+ ")");
-        System.out.println("hrData("+ hrData.size() +")");
+        logger.info("coordinateList("+ coordinateList.size()+ ")");
+        logger.info("hrData("+ hrData.size() +")");
 
         for (Coordinate coordinate : coordinateList)
-            System.out.println(coordinate.toString());
+            logger.info(coordinate.toString());
 
         for (Integer key : hrData.keySet())
-            System.out.println( key +" "+hrData.get(key));
+            logger.info( key +" "+hrData.get(key));
 
     }
 
     public void normalize(){
         Random random = new Random();
+        if ((coordinateList.size() == 0) || (hrData.size() == 0))
+            return;
+
         while (coordinateList.size() > hrData.size()){
             int keyCount = coordinateList.size();
             coordinateList.remove(random.nextInt(keyCount));
@@ -127,6 +144,90 @@ public class Workout {
         sb.append("</trkseg>");
         sb.append("</trk>");
         sb.append("</gpx>");
+    }
+
+    public void readHrmFile(List<String> hrmFile){
+        try {
+            Boolean startOfHRdata = false;
+            for(String readString : hrmFile ) {
+                readString = readString.trim();
+
+                if (startOfHRdata) {
+                    String pulseStr = readString.split("\t")[0];
+                    addPulse(Integer.valueOf(pulseStr));
+                }
+
+                if ((!startOfHRdata) && (readString.contains("[HRData]")))
+                    startOfHRdata = Boolean.TRUE;
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+    }
+
+    public void readGpxFile(List<String> gpxFile){
+        try {
+            String readString;
+
+            for(int idx = 0; idx < gpxFile.size(); idx++){
+                readString = gpxFile.get(idx).trim();
+                if (readString.startsWith("<trkpt")){
+                    Coordinate cordinate = new Coordinate();
+                    cordinate.setLatitude(getCleanVal(getAtribValue(readString, "lat")));
+                    cordinate.setLongitude(getCleanVal(getAtribValue(readString, "lon")));
+
+                    readString = gpxFile.get(++idx).trim();
+                    String timestampStr = getTagVal(readString, "time");
+                    Date dt = df.parse(timestampStr);
+                    cordinate.setTimeStamp(dt);
+
+                    readString = gpxFile.get(++idx).trim();
+                    if (readString.contains("ele")){
+                        Double val = Double.valueOf(getTagVal(readString, "ele"));
+                        cordinate.setElevation(val);
+                    }
+
+                    if (cordinate.isOk())
+                        addCoordinate(cordinate);
+                }
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public String getTagVal(String orgStr, String readTagName){
+        String rezStr = orgStr.trim();
+        rezStr = rezStr.replaceAll("<"+ readTagName +">", "");
+        rezStr = rezStr.replaceAll("</"+ readTagName +">", "");
+        return rezStr.trim();
+    }
+
+    public String getAtribValue(String readStr, String key) {
+        readStr = readStr.trim();
+        for (String splitBySpace : readStr.trim().split(" ")){
+            String splitByEqual[] =  splitBySpace.trim().split("=");
+            if (splitByEqual.length == 2){
+                if (splitByEqual[0].contentEquals(key))
+                    return splitByEqual[1];
+            }
+        }
+        return null;
+    }
+    public String getCleanVal(String val){
+        Boolean containBadSimb = Boolean.FALSE;
+        String endStr = "";
+        for (char ch : val.toCharArray()){
+            containBadSimb = Boolean.FALSE;
+            for (char ch2 : badSimb)
+                if (ch == ch2)
+                    containBadSimb = Boolean.TRUE;
+
+            if (!containBadSimb)
+                endStr += ch;
+        }
+        return endStr;
     }
 
 

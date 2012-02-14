@@ -9,7 +9,11 @@
   <head><title>Simple jsp page</title></head>
   <body>
     <form action="<%= blobstoreService.createUploadUrl("/upload") %>" method="post" enctype="multipart/form-data">
-        <input type="file" name="myFile">
+        <label > gpx file2</label>
+        <input type="file" name="gpxFile">
+        <br>
+        <label > hrm file2</label>
+        <input type="file" name="hrmFile">
         <input type="submit" value="Submit">
     </form>
   </body>

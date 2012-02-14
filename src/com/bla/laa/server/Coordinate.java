@@ -1,3 +1,5 @@
+package com.bla.laa.server;
+
 import java.util.Date;
 
 public class Coordinate implements  Comparable<Coordinate> {
