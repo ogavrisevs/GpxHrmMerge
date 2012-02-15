@@ -13,7 +13,7 @@ import java.util.logging.Logger;
 public class Workout {
     private static final Logger logger = Logger.getLogger(Workout.class.getName());
 
-    private static final String LINE_END = "\n";
+    public static final String LINE_END = "\n";
     SimpleDateFormat formatter = new SimpleDateFormat(TIME_STAMP_FORMAT);
     private static final char badSimb[] = {'>', '<', '\"'};
     public static final String TIME_STAMP_FORMAT = "yyyy-MM-dd'T'HH:mm:ss'Z'";
@@ -26,18 +26,6 @@ public class Workout {
 
     public void sort(){
         Collections.sort(coordinateList);
-    }
-
-    public void print(){
-        logger.info("coordinateList("+ coordinateList.size()+ ")");
-        logger.info("hrData("+ hrData.size() +")");
-
-        for (Coordinate coordinate : coordinateList)
-            logger.info(coordinate.toString());
-
-        for (Integer key : hrData.keySet())
-            logger.info( key +" "+hrData.get(key));
-
     }
 
     public void normalize(){
@@ -55,9 +43,33 @@ public class Workout {
         }
     }
 
-    public StringBuffer generateGpxFileWithHrm(){
+    public void printSummary(){
+        logger.info("coordinateList("+ coordinateList.size()+ ")");
+        logger.info("hrData("+ hrData.size() +")");
+    }
 
+    public void print(){
+        printSummary();
+        for (Coordinate coordinate : coordinateList)
+            logger.info(coordinate.toString());
+
+        for (Integer key : hrData.keySet())
+            logger.info( key +" "+hrData.get(key));
+    }
+
+    public List<String> generateGpxFileWithHrmToList(){
+        List<String> list = new ArrayList<String>();
+        StringBuffer mergedFile = generateGpxFileWithHrm();
+        for (String line  : mergedFile.toString().split(Workout.LINE_END))
+            list.add(line);
+        return list;
+    }
+
+    public StringBuffer generateGpxFileWithHrm(){
         StringBuffer sb = new StringBuffer();
+        if(coordinateList.isEmpty() || hrData.isEmpty())
+            return sb;
+
         Integer hrKeyKey = 0;
         addGpxHeader(sb);
 
