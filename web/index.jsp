@@ -10,7 +10,7 @@
   <body>
     <form action="<%= blobstoreService.createUploadUrl("/upload") %>" method="post" enctype="multipart/form-data">
         <label > gpx file2</label>
-        <input type="file" name="gpxFile">
+        <input type="file" name="gpxFile" title="title" value="value" >
         <br>
         <label > hrm file2</label>
         <input type="file" name="hrmFile">

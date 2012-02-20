@@ -42,6 +42,11 @@ public class Upload extends HttpServlet {
         List<String> gpxFile = readFile(gpxBlobKey);
         List<String> hrmFile = readFile(hrmBlobKey);
 
+        if ((gpxFile.isEmpty()) || (hrmFile.isEmpty())){
+            res.sendError( 404, " Error reading files ");
+            return;
+        }
+
         Workout workout = new Workout();
         workout.readGpxFile(gpxFile);
         workout.readHrmFile(hrmFile);
@@ -49,19 +54,21 @@ public class Upload extends HttpServlet {
         workout.normalize();
         workout.printSummary();
 
-        List<String> list =  workout.generateGpxFileWithHrmToList();
-
-        res.setContentType("text/csv");
-        res.setHeader("Content-Disposition", "attachment; fileName=data.csv");
-
-        int size = 0;
-        ServletOutputStream out = res.getOutputStream();
-        for (String str : list){
-            out.write(str.getBytes());
-            size += str.getBytes().length;
+        if ( workout.getCoordinateList().isEmpty() || workout.getHrData().isEmpty()){
+            res.sendError( 404, " Error processing files ");
+            return;
+        } else {
+            List<String> list =  workout.generateGpxFileWithHrmToList();
+            res.setContentType("text/xml");
+            res.setHeader("Content-Disposition", "attachment; fileName=workout.gpx");
+            int size = 0;
+            ServletOutputStream out = res.getOutputStream();
+            for (String str : list){
+                out.write(str.getBytes());
+                size += str.getBytes().length;
+            }
+            res.setContentLength(size);
         }
-
-        res.setContentLength(size);
 
         //BlobKey blobKey = writeFile(list);
         //blobstoreService.serve(blobKey, res);

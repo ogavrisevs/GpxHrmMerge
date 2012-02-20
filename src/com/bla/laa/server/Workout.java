@@ -22,7 +22,7 @@ public class Workout {
     private List<Coordinate> coordinateList = new ArrayList<Coordinate>();
     private Map<Integer, Integer> hrData = new HashMap<Integer, Integer>();
     private static Integer index = 1;
-
+    private Date  startTime  = null;
 
     public void sort(){
         Collections.sort(coordinateList);
@@ -61,7 +61,7 @@ public class Workout {
         List<String> list = new ArrayList<String>();
         StringBuffer mergedFile = generateGpxFileWithHrm();
         for (String line  : mergedFile.toString().split(Workout.LINE_END))
-            list.add(line);
+            list.add(line + Workout.LINE_END);
         return list;
     }
 
@@ -139,7 +139,12 @@ public class Workout {
         sb.append("<link href=\"http://www.garmin.com\">");
         sb.append("<text>Garmin International</text>");
         sb.append("</link>");
-        sb.append("<time>2012-01-01T19:08:38Z</time>");
+
+        //sb.append("<time>2012-01-01T19:08:38Z</time>");
+        sb.append("<time>");
+        sb.append(formatter.format(getStartTime()));
+        sb.append("</time>");
+
         sb.append("</metadata>");
         sb.append("<trk>");
         sb.append("<name>01-JAN-12 20:08:34</name>");
@@ -161,12 +166,13 @@ public class Workout {
     public void readHrmFile(List<String> hrmFile){
         try {
             Boolean startOfHRdata = false;
-            for(String readString : hrmFile ) {
+            for(String readString : hrmFile){
                 readString = readString.trim();
 
                 if (startOfHRdata) {
                     String pulseStr = readString.split("\t")[0];
-                    addPulse(Integer.valueOf(pulseStr));
+                    if (!pulseStr.isEmpty())
+                        addPulse(Integer.valueOf(pulseStr));
                 }
 
                 if ((!startOfHRdata) && (readString.contains("[HRData]")))
@@ -183,25 +189,32 @@ public class Workout {
 
             for(int idx = 0; idx < gpxFile.size(); idx++){
                 readString = gpxFile.get(idx).trim();
+
                 if (readString.startsWith("<trkpt")){
                     Coordinate cordinate = new Coordinate();
                     cordinate.setLatitude(getCleanVal(getAtribValue(readString, "lat")));
                     cordinate.setLongitude(getCleanVal(getAtribValue(readString, "lon")));
 
+                    if (++idx >= gpxFile.size())
+                        break;
+
                     readString = gpxFile.get(++idx).trim();
+
                     String timestampStr = getTagVal(readString, "time");
                     Date dt = df.parse(timestampStr);
                     cordinate.setTimeStamp(dt);
 
-                    readString = gpxFile.get(++idx).trim();
-                    if (readString.contains("ele")){
-                        Double val = Double.valueOf(getTagVal(readString, "ele"));
-                        cordinate.setElevation(val);
-                    }
-
                     if (cordinate.isOk())
                         addCoordinate(cordinate);
                 }
+
+                if (readString.startsWith("<time>") && getStartTime() == null ){
+                    String timestampStr = getTagVal(readString, "time");
+                    Date dt = df.parse(timestampStr);
+                    setStartTime(dt);
+                }
+
+
             }
 
         } catch (Exception e) {
@@ -216,7 +229,7 @@ public class Workout {
         return rezStr.trim();
     }
 
-    public String getAtribValue(String readStr, String key) {
+    private String getAtribValue(String readStr, String key) {
         readStr = readStr.trim();
         for (String splitBySpace : readStr.trim().split(" ")){
             String splitByEqual[] =  splitBySpace.trim().split("=");
@@ -242,13 +255,13 @@ public class Workout {
         return endStr;
     }
 
-
-
-
     public void addPulse(Integer pulse) {
         this.hrData.put(index++, pulse);
     }
 
+    public Map<Integer, Integer> getHrData() {
+        return hrData;
+    }
 
     public void addCoordinate(Coordinate coordinate) {
         this.coordinateList.add(coordinate);
@@ -262,7 +275,12 @@ public class Workout {
         this.coordinateList = coordinateList;
     }
 
+    public Date getStartTime() {
+        return startTime;
+    }
 
-
+    public void setStartTime(Date startTime) {
+        this.startTime = startTime;
+    }
 }
 

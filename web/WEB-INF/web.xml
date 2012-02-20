@@ -6,15 +6,6 @@
          version="2.5">
 
     <servlet>
-        <servlet-name>rootService</servlet-name>
-        <servlet-class>com.bla.laa.server.rootServiceImpl</servlet-class>
-    </servlet>
-    <servlet-mapping>
-        <servlet-name>rootService</servlet-name>
-        <url-pattern>/root/rootService</url-pattern>
-    </servlet-mapping>
-
-    <servlet>
         <servlet-name>Upload</servlet-name>
         <servlet-class>com.bla.laa.server.Upload</servlet-class>
     </servlet>
