@@ -1,9 +1,5 @@
 package com.bla.laa.server;
 
-import java.io.BufferedReader;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.IOException;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -12,11 +8,16 @@ import java.util.logging.Logger;
 
 public class Workout {
     private static final Logger logger = Logger.getLogger(Workout.class.getName());
+    private static final String CREATOR = "polarmrg.appspot.com";
 
     public static final String LINE_END = "\n";
-    SimpleDateFormat formatter = new SimpleDateFormat(TIME_STAMP_FORMAT);
     private static final char badSimb[] = {'>', '<', '\"'};
+    SimpleDateFormat formatter = new SimpleDateFormat(TIME_STAMP_FORMAT);
     public static final String TIME_STAMP_FORMAT = "yyyy-MM-dd'T'HH:mm:ss'Z'";
+
+    SimpleDateFormat dateFormatter = new SimpleDateFormat(TIME_STAMP_FORMAT);
+    public static final String DATE_FORMAT = "yyyy-MM-dd";
+
     private DateFormat df = new SimpleDateFormat(TIME_STAMP_FORMAT);
 
     private List<Coordinate> coordinateList = new ArrayList<Coordinate>();
@@ -29,6 +30,7 @@ public class Workout {
     }
 
     public void normalize(){
+        logger.info("normalize()");
         Random random = new Random();
         if ((coordinateList.size() == 0) || (hrData.size() == 0))
             return;
@@ -66,6 +68,7 @@ public class Workout {
     }
 
     public StringBuffer generateGpxFileWithHrm(){
+        logger.info("generateGpxFileWithHrm()");
         StringBuffer sb = new StringBuffer();
         if(coordinateList.isEmpty() || hrData.isEmpty())
             return sb;
@@ -126,33 +129,31 @@ public class Workout {
     }
 
     public void addGpxHeader(StringBuffer sb){
-
         sb.append("<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\" ?> ");
-        sb.append("<gpx xmlns=\"http://www.topografix.com/GPX/1/1\" ");
-        sb.append("xmlns:gpxx=\"http://www.garmin.com/xmlschemas/WaypointExtension/v1\"");
-        sb.append("xmlns:gpxtrx=\"http://www.garmin.com/xmlschemas/GpxExtensions/v3\"");
-        sb.append("xmlns:gpxtpx=\"http://www.garmin.com/xmlschemas/TrackPointExtension/v1\"");
-        sb.append("creator=\"Oregon 550t\" version=\"1.1\"");
-        sb.append("xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"");
-        sb.append("xsi:schemaLocation=\"http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd http://www.garmin.com/xmlschemas/WaypointExtension/v1 http://www8.garmin.com/xmlschemas/WaypointExtensionv1.xsd http://www.garmin.com/xmlschemas/TrackPointExtension/v1 http://www.garmin.com/xmlschemas/TrackPointExtensionv1.xsd\">");
+        sb.append("<gpx ");
+            sb.append("xmlns:gpxx=\"http://www.garmin.com/xmlschemas/WaypointExtension/v1\" ");
+            sb.append("xmlns:gpxtrx=\"http://www.garmin.com/xmlschemas/GpxExtensions/v3\" ");
+            sb.append("xmlns:gpxtpx=\"http://www.garmin.com/xmlschemas/TrackPointExtension/v1\" ");
+            sb.append("creator=\""+ CREATOR +"\" ");
+            sb.append("version=\"1.0\" ");
+            sb.append("xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" ");
+            sb.append("xmlns=\"http://www.topografix.com/GPX/1/0\" ");
+            sb.append("xsi:schemaLocation=\"http://www.topografix.com/GPX/1/0 http://www.topografix.com/GPX/1/0/gpx.xsd\" ");
+        sb.append(">");
+
         sb.append("<metadata>");
-        sb.append("<link href=\"http://www.garmin.com\">");
-        sb.append("<text>Garmin International</text>");
-        sb.append("</link>");
-
-        //sb.append("<time>2012-01-01T19:08:38Z</time>");
-        sb.append("<time>");
-        sb.append(formatter.format(getStartTime()));
-        sb.append("</time>");
-
+            sb.append("<time>");
+            sb.append(formatter.format(getStartTime()));
+            sb.append("</time>");
         sb.append("</metadata>");
+
         sb.append("<trk>");
-        sb.append("<name>01-JAN-12 20:08:34</name>");
-        sb.append("<extensions>");
-        sb.append("<gpxtrx:TrackExtension>");
-        sb.append("<gpxtrx:DisplayColor>Black</gpxtrx:DisplayColor>");
-        sb.append("</gpxtrx:TrackExtension>");
-        sb.append("</extensions>");
+            sb.append("<name> workout("+ dateFormatter +") by "+ CREATOR +"</name>");
+            sb.append("<extensions>");
+                sb.append("<gpxtrx:TrackExtension>");
+                sb.append("<gpxtrx:DisplayColor>Black</gpxtrx:DisplayColor>");
+                sb.append("</gpxtrx:TrackExtension>");
+            sb.append("</extensions>");
         sb.append("<trkseg>");
 
     }
@@ -185,41 +186,67 @@ public class Workout {
 
     public void readGpxFile(List<String> gpxFile){
         try {
-            String readString;
-
-            for(int idx = 0; idx < gpxFile.size(); idx++){
-                readString = gpxFile.get(idx).trim();
-
-                if (readString.startsWith("<trkpt")){
-                    Coordinate cordinate = new Coordinate();
-                    cordinate.setLatitude(getCleanVal(getAtribValue(readString, "lat")));
-                    cordinate.setLongitude(getCleanVal(getAtribValue(readString, "lon")));
-
-                    if (++idx >= gpxFile.size())
-                        break;
-
-                    readString = gpxFile.get(++idx).trim();
-
-                    String timestampStr = getTagVal(readString, "time");
-                    Date dt = df.parse(timestampStr);
-                    cordinate.setTimeStamp(dt);
-
+            for (int idx = 0; idx < gpxFile.size(); idx++) {
+                String readstr = gpxFile.get(idx).trim();
+                if (readstr.startsWith("<trkpt")) {
+                    Coordinate cordinate = readCoordinate(gpxFile, idx);
                     if (cordinate.isOk())
                         addCoordinate(cordinate);
                 }
-
-                if (readString.startsWith("<time>") && getStartTime() == null ){
-                    String timestampStr = getTagVal(readString, "time");
-                    Date dt = df.parse(timestampStr);
-                    setStartTime(dt);
+                if (readstr.startsWith("<gpx")) {
+                    setStartTime(readStartTime(gpxFile, idx));
                 }
-
-
             }
-
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    public Date readStartTime(List<String> gpxFile,int idx) throws ParseException {
+        Date dt = null;
+        String readString = "";
+        readString = gpxFile.get(idx);
+        while(true){
+            if (readString.startsWith("<time")){
+                String timestampStr = getTagVal(readString, "time");
+                dt = df.parse(timestampStr);
+            }
+            if (readString.contains("<trkpt>"))
+                break;
+            if ((idx+1) >= gpxFile.size())
+                break;
+            readString = gpxFile.get(++idx).trim();
+            if ((readString == null) || (readString.isEmpty()))
+                break;
+        }
+        return dt;
+    }
+
+    private Coordinate readCoordinate(List<String> gpxFile, int idx ) throws ParseException {
+        Coordinate cordinate = new Coordinate();
+        String readString = "";
+        readString = gpxFile.get(idx);
+        while(true){
+            if (readString.startsWith("<trkpt") && cordinate.getLatitude().isEmpty() && cordinate.getLongitude().isEmpty()){
+                cordinate.setLatitude(getCleanVal(getAtribValue(readString, "lat")));
+                cordinate.setLongitude(getCleanVal(getAtribValue(readString, "lon")));
+            }
+            if (readString.startsWith("<time") && cordinate.getTimeStamp() == null){
+                String timestampStr = getTagVal(readString, "time");
+                Date dt = df.parse(timestampStr);
+                cordinate.setTimeStamp(dt);
+            }
+            if (readString.contains("</trkpt>"))
+                break;
+            if ((idx+1) >= gpxFile.size())
+                break;
+            readString = gpxFile.get(++idx).trim();
+
+            if ((readString == null) || (readString.isEmpty()))
+                break;
+        }
+        return  cordinate;
+
     }
 
     public String getTagVal(String orgStr, String readTagName){
@@ -282,5 +309,7 @@ public class Workout {
     public void setStartTime(Date startTime) {
         this.startTime = startTime;
     }
+
+
 }
 

@@ -4,9 +4,9 @@ import java.util.Date;
 
 public class Coordinate implements  Comparable<Coordinate> {
 
-    private String latitude;
-    private String longitude;
-    private Date timeStamp;
+    private String latitude = "";
+    private String longitude = "";
+    private Date timeStamp = null;
 
     public Boolean isOk (){
         if ((longitude == null) || (longitude.length() == 0))

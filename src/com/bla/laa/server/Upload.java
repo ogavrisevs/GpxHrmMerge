@@ -3,25 +3,17 @@ package com.bla.laa.server;
 import com.google.appengine.api.blobstore.BlobKey;
 import com.google.appengine.api.blobstore.BlobstoreService;
 import com.google.appengine.api.blobstore.BlobstoreServiceFactory;
-import com.google.appengine.api.blobstore.BlobstoreServicePb;
-import com.google.appengine.api.blobstore.ByteRange;
-import com.google.appengine.api.files.AppEngineFile;
-import com.google.appengine.api.files.FileReadChannel;
-import com.google.appengine.api.files.FileService;
-import com.google.appengine.api.files.FileServiceFactory;
-import com.google.appengine.api.files.FileWriteChannel;
+import com.google.appengine.api.files.*;
 
 import javax.servlet.ServletException;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.nio.ByteBuffer;
 import java.nio.channels.Channels;
-import java.sql.Time;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -34,10 +26,11 @@ public class Upload extends HttpServlet {
 
     public void doPost(HttpServletRequest req, HttpServletResponse res)
             throws ServletException, IOException {
+        logger.info("Upload.doPost()");
 
-        Map<String, BlobKey> blobs = blobstoreService.getUploadedBlobs(req);
-        BlobKey gpxBlobKey = blobs.get("gpxFile");
-        BlobKey hrmBlobKey = blobs.get("hrmFile");
+        Map<String, List<BlobKey>> blobs = blobstoreService.getUploads(req);
+        BlobKey gpxBlobKey = blobs.get("gpxFile").get(0);
+        BlobKey hrmBlobKey = blobs.get("hrmFile").get(0);
 
         List<String> gpxFile = readFile(gpxBlobKey);
         List<String> hrmFile = readFile(hrmBlobKey);
@@ -59,8 +52,9 @@ public class Upload extends HttpServlet {
             return;
         } else {
             List<String> list =  workout.generateGpxFileWithHrmToList();
+            String dateStr =  workout.dateFormatter.format(workout.getStartTime());
             res.setContentType("text/xml");
-            res.setHeader("Content-Disposition", "attachment; fileName=workout.gpx");
+            res.setHeader("Content-Disposition", "attachment; fileName=workout_"+ dateStr +".gpx");
             int size = 0;
             ServletOutputStream out = res.getOutputStream();
             for (String str : list){
@@ -92,8 +86,8 @@ public class Upload extends HttpServlet {
         while (blobKey == null)
             blobKey = fileService.getBlobKey(file);
 
-        logger.info(file.getFullPath());
-        logger.info(blobKey.toString());
+        //logger.info(file.getFullPath());
+        //logger.info(blobKey.toString());
 
         return blobKey;
     }
@@ -108,7 +102,7 @@ public class Upload extends HttpServlet {
             file = fileService.getBlobFile(blobKey);
             ch = fileService.openReadChannel(file, false);
         } catch (Exception e) {
-            logger.severe(e.getMessage());
+            //logger.severe(e.getMessage());
         }
 
         StringBuffer sb = new StringBuffer();
@@ -122,7 +116,7 @@ public class Upload extends HttpServlet {
                 buf.clear();
             }
         } catch (IOException e) {
-            logger.severe(e.getMessage());
+            //logger.severe(e.getMessage());
 
         }
 
