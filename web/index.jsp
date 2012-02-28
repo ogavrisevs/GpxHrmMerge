@@ -13,16 +13,16 @@
   <body>
     <h3> Merge your workout data (heart rate and gpx track) from
          <a href="http://www.polar.fi/en/products/maximize_performance/running_multisport/RS800CX">polar</a>
-        sport clock for import to
+        sport clock to import into
         <a href="http://www.endomondo.com">endomondo.com</a> site !!!
     </h3>
-    <form action="<%= blobstoreService.createUploadUrl("/upl    oad") %>" method="post" enctype="multipart/form-data">
+    <form action="<%= blobstoreService.createUploadUrl("/upload") %>" method="post" enctype="multipart/form-data">
         <label > Set *.gpx file : </label>
         <input type="file" name="gpxFile" class="gpxFile">
         <br>
         <label > Set *.hrm file : </label>
         <input type="file" name="hrmFile" class="hrmFile">
-        <input type="submit" value="Merege Files">
+        <input type="submit" value="Merge Files">
     </form>
 
     <br>
@@ -33,8 +33,25 @@
     </h4>
     <img src="\img\Transfere.png" alt="some_text"/>
 
-    <h4> 2. Find importetd files on PC (where "")</h4>
+    <h4> 2. Find importetd files on PC (where "user name" is your Windows user)</h4>
     <img src="\img\FilesonPc.png" alt="some_text"/>
+
+    <h4> 3. Go to
+    <a href="http://polarmrg.appspot.com"> PolarMrg site </a>
+        and upload gpx and hrm files ( there will be two hrm files ! chose file with smallest size ).
+    </h4>
+    <img src="\img\UploadF.png" alt="some_text"/>
+
+    <h4> 4. Save mergeet file on PC </h4>
+    <h4> 5. Goto  :  <a href="http://www.endomondo.com">endomondo.com</a>
+        and login.
+    </h4>
+    <h4> 6. Chose : Workouts ->  Import Workout -> Import from file </h4>
+    <img src="\img\EndoUpload.png" alt="some_text"/>
+
+    <h4> 7. Choose and upload merget worout gpx file  </h4>
+
+
 
   </body>
 </html>

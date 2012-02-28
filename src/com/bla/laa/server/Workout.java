@@ -15,7 +15,7 @@ public class Workout {
     SimpleDateFormat formatter = new SimpleDateFormat(TIME_STAMP_FORMAT);
     public static final String TIME_STAMP_FORMAT = "yyyy-MM-dd'T'HH:mm:ss'Z'";
 
-    SimpleDateFormat dateFormatter = new SimpleDateFormat(TIME_STAMP_FORMAT);
+    SimpleDateFormat dateFormatter = new SimpleDateFormat(DATE_FORMAT);
     public static final String DATE_FORMAT = "yyyy-MM-dd";
 
     private DateFormat df = new SimpleDateFormat(TIME_STAMP_FORMAT);
@@ -148,7 +148,7 @@ public class Workout {
         sb.append("</metadata>");
 
         sb.append("<trk>");
-            sb.append("<name> workout("+ dateFormatter +") by "+ CREATOR +"</name>");
+            sb.append("<name> workout("+ dateFormatter.format(getStartTime()) +") by "+ CREATOR +"</name>");
             sb.append("<extensions>");
                 sb.append("<gpxtrx:TrackExtension>");
                 sb.append("<gpxtrx:DisplayColor>Black</gpxtrx:DisplayColor>");
@@ -265,9 +265,16 @@ public class Workout {
                     return splitByEqual[1];
             }
         }
+
+        logger.severe("getAtribValue("+ readStr +", "+ key +") = fail ! ");
         return null;
     }
     public String getCleanVal(String val){
+        if ((val == null) || (val.isEmpty())){
+            logger.severe("getCleanVal() == unSsuccessful! ");
+            return "";
+        }
+
         Boolean containBadSimb = Boolean.FALSE;
         String endStr = "";
         for (char ch : val.toCharArray()){
