@@ -1,5 +1,7 @@
 package com.bla.laa.server;
 
+import com.bla.laa.server.exception.CustomException;
+
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -29,11 +31,11 @@ public class Workout {
         Collections.sort(coordinateList);
     }
 
-    public void normalize(){
+    public void normalize() throws CustomException {
         logger.info("normalize()");
         Random random = new Random();
         if ((coordinateList.size() == 0) || (hrData.size() == 0))
-            return;
+            throw  new CustomException();
 
         while (coordinateList.size() > hrData.size()){
             int keyCount = coordinateList.size();
@@ -164,7 +166,7 @@ public class Workout {
         sb.append("</gpx>");
     }
 
-    public void readHrmFile(List<String> hrmFile){
+    public void readHrmFile(List<String> hrmFile) throws CustomException {
         try {
             Boolean startOfHRdata = false;
             for(String readString : hrmFile){
@@ -182,9 +184,11 @@ public class Workout {
         }catch (Exception e){
             e.printStackTrace();
         }
+        if (hrmFile.size() == 0)
+            throw new CustomException("Cannot parse Hrm file !");
     }
 
-    public void readGpxFile(List<String> gpxFile){
+    public void readGpxFile(List<String> gpxFile) throws CustomException {
         try {
             for (int idx = 0; idx < gpxFile.size(); idx++) {
                 String readstr = gpxFile.get(idx).trim();
@@ -200,6 +204,9 @@ public class Workout {
         } catch (Exception e) {
             e.printStackTrace();
         }
+        if (gpxFile.size() == 0)
+            throw new CustomException("Cannot parse Gpx file !");
+
     }
 
     public Date readStartTime(List<String> gpxFile,int idx) throws ParseException {
