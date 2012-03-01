@@ -3,6 +3,7 @@
 
 <%
     BlobstoreService blobstoreService = BlobstoreServiceFactory.getBlobstoreService();
+    String tutorialUrl = "http://"+  request.getServerName() +":"+ request.getServerPort() +"/Tutorial.jsp";
 %>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <html>
@@ -16,7 +17,7 @@
         sport clock to import into
         <a href="http://www.endomondo.com">endomondo.com</a>
         site ( read
-        <a href="http://polarmrg.appspot.com/Tutorial.jsp">tutorial</a>
+        <a href="<%= tutorialUrl %>">tutorial</a>
         )
     </h3>
     <form action="<%= blobstoreService.createUploadUrl("/upload") %>" method="post" enctype="multipart/form-data">

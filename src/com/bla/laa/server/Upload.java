@@ -54,7 +54,8 @@ public class Upload extends HttpServlet {
         } catch (CustomException e) {
             returnError(res, e.getMessage());
         } catch (Exception e) {
-            logger.severe(e .getMessage());
+            logger.severe(e.getMessage());
+            e.printStackTrace();
 
         } finally {
             if (gpxBlobKey != null){
@@ -90,7 +91,11 @@ public class Upload extends HttpServlet {
             size += str.getBytes().length;
         }
         res.setContentLength(size);
-        res.setHeader("Refresh", "1");
+
+        //res.sendRedirect("http://pods.lv");
+        RequestDispatcher rd = req.getRequestDispatcher("/"); //index.jsp
+        rd.forward(req, res);
+
     }
 }
 
