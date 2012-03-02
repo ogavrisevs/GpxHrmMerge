@@ -6,17 +6,20 @@ import com.google.appengine.api.blobstore.BlobstoreService;
 import com.google.appengine.api.blobstore.BlobstoreServiceFactory;
 import com.google.appengine.api.files.*;
 
+import javax.jdo.PersistenceManager;
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.nio.channels.Channels;
 import java.util.ArrayList;
+import java.util.Enumeration;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
@@ -25,11 +28,19 @@ public class Upload extends HttpServlet {
     private static final Logger logger = Logger.getLogger(Upload.class.getName());
     private BlobstoreService blobstoreService = BlobstoreServiceFactory.getBlobstoreService();
     FileService fileService = FileServiceFactory.getFileService();
+    PersistenceManager pm = Pm.get().getPersistenceManager();
 
     public void doPost(HttpServletRequest req, HttpServletResponse res)
             throws ServletException, IOException {
-
         logger.info("Upload.doPost()");
+
+        Enumeration enumeration  = req.getParameterNames();
+        while (enumeration.hasMoreElements()){
+            Object obj = enumeration.nextElement();
+            logger.info((String) obj);
+        }
+
+
         BlobKey gpxBlobKey = null;
         BlobKey hrmBlobKey = null;
         try{
@@ -47,8 +58,11 @@ public class Upload extends HttpServlet {
             workout.normalize();
             workout.printSummary();
 
-            if ( !workout.getCoordinateList().isEmpty() && !workout.getHrData().isEmpty()){
-                printRez(workout, res, req);
+            if ( !workout.getModel().getCoordinateList().isEmpty() && !workout.getModel().getHrData().isEmpty()){
+                WorkoutModel model = workout.getModel();
+                pm.makePersistent(model);
+                RequestDispatcher rd = req.getRequestDispatcher("/Download?key="+ model.getKey().getId());
+                rd.forward(req, res);
             }
 
         } catch (CustomException e) {
@@ -79,23 +93,5 @@ public class Upload extends HttpServlet {
         res.sendError( 404, " Error reading files ");
     }
 
-    public void printRez (Workout workout, HttpServletResponse res, HttpServletRequest req) throws IOException, ServletException {
-        List<String> list =  workout.generateGpxFileWithHrmToList();
-        String dateStr =  workout.dateFormatter.format(workout.getStartTime());
-        res.setContentType("text/xml");
-        res.setHeader("Content-Disposition", "attachment; fileName=workout_"+ dateStr +".gpx");
-        int size = 0;
-        ServletOutputStream out = res.getOutputStream();
-        for (String str : list){
-            out.write(str.getBytes());
-            size += str.getBytes().length;
-        }
-        res.setContentLength(size);
-
-        //res.sendRedirect("http://pods.lv");
-        RequestDispatcher rd = req.getRequestDispatcher("/"); //index.jsp
-        rd.forward(req, res);
-
-    }
 }
 

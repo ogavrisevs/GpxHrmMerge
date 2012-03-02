@@ -9,9 +9,22 @@
         <servlet-name>Upload</servlet-name>
         <servlet-class>com.bla.laa.server.Upload</servlet-class>
     </servlet>
+
     <servlet-mapping>
         <servlet-name>Upload</servlet-name>
         <url-pattern>/upload</url-pattern>
+    </servlet-mapping>
+
+    <!--===============================================-->
+
+    <servlet>
+        <servlet-name>Download</servlet-name>
+        <servlet-class>com.bla.laa.server.Download</servlet-class>
+    </servlet>
+
+    <servlet-mapping>
+        <servlet-name>Download</servlet-name>
+        <url-pattern>/download</url-pattern>
     </servlet-mapping>
 
 

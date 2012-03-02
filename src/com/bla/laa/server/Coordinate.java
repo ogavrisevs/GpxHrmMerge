@@ -1,11 +1,26 @@
 package com.bla.laa.server;
 
+import javax.jdo.annotations.IdGeneratorStrategy;
+import javax.jdo.annotations.PersistenceCapable;
+import javax.jdo.annotations.Persistent;
+import javax.jdo.annotations.PrimaryKey;
 import java.util.Date;
+import javax.jdo.annotations.IdentityType;
 
+@PersistenceCapable(identityType = IdentityType.APPLICATION)
 public class Coordinate implements  Comparable<Coordinate> {
 
+    @PrimaryKey
+    @Persistent(valueStrategy = IdGeneratorStrategy.IDENTITY)
+    private com.google.appengine.api.datastore.Key key;
+
+    @Persistent
     private String latitude = "";
+
+    @Persistent
     private String longitude = "";
+
+    @Persistent
     private Date timeStamp = null;
 
     public Boolean isOk (){

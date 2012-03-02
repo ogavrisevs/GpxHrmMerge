@@ -22,43 +22,42 @@ public class Workout {
 
     private DateFormat df = new SimpleDateFormat(TIME_STAMP_FORMAT);
 
-    private List<Coordinate> coordinateList = new ArrayList<Coordinate>();
-    private Map<Integer, Integer> hrData = new HashMap<Integer, Integer>();
+    WorkoutModel model = new WorkoutModel();
+
     private static Integer index = 1;
-    private Date  startTime  = null;
 
     public void sort(){
-        Collections.sort(coordinateList);
+        Collections.sort(model.getCoordinateList());
     }
 
     public void normalize() throws CustomException {
         logger.info("normalize()");
         Random random = new Random();
-        if ((coordinateList.size() == 0) || (hrData.size() == 0))
+        if ((model.getCoordinateList().size() == 0) || (model.getHrData().size() == 0))
             throw  new CustomException();
 
-        while (coordinateList.size() > hrData.size()){
-            int keyCount = coordinateList.size();
-            coordinateList.remove(random.nextInt(keyCount));
+        while (model.getCoordinateList().size() > model.getHrData().size()){
+            int keyCount = model.getCoordinateList().size();
+            model.getCoordinateList().remove(random.nextInt(keyCount));
         }
-        while (coordinateList.size() < hrData.size()){
-            int keyCount = coordinateList.size();
-            hrData.remove(random.nextInt(keyCount));
+        while (model.getCoordinateList().size() < model.getHrData().size()){
+            int keyCount = model.getCoordinateList().size();
+            model.getHrData().remove(random.nextInt(keyCount));
         }
     }
 
     public void printSummary(){
-        logger.info("coordinateList("+ coordinateList.size()+ ")");
-        logger.info("hrData("+ hrData.size() +")");
+        logger.info("coordinateList("+ model.getCoordinateList().size()+ ")");
+        logger.info("hrData("+ model.getHrData().size() +")");
     }
 
     public void print(){
         printSummary();
-        for (Coordinate coordinate : coordinateList)
+        for (Coordinate coordinate : model.getCoordinateList())
             logger.info(coordinate.toString());
 
-        for (Integer key : hrData.keySet())
-            logger.info( key +" "+hrData.get(key));
+        for (Integer key : model.getHrData().keySet())
+            logger.info( key +" "+model.getHrData().get(key));
     }
 
     public List<String> generateGpxFileWithHrmToList(){
@@ -72,16 +71,16 @@ public class Workout {
     public StringBuffer generateGpxFileWithHrm(){
         logger.info("generateGpxFileWithHrm()");
         StringBuffer sb = new StringBuffer();
-        if(coordinateList.isEmpty() || hrData.isEmpty())
+        if(model.getCoordinateList().isEmpty() || model.getHrData().isEmpty())
             return sb;
 
         Integer hrKeyKey = 0;
         addGpxHeader(sb);
 
-        for(Coordinate  coordinate : coordinateList){
+        for(Coordinate  coordinate : model.getCoordinateList()){
              hrKeyKey++;
 
-            while(!hrData.containsKey(hrKeyKey))
+            while(!model.getHrData().containsKey(hrKeyKey))
                 hrKeyKey++;
 
             sb.append("<trkpt ");
@@ -111,7 +110,7 @@ public class Workout {
                     sb.append(LINE_END);
 
                     sb.append("<gpxtpx:hr>");
-                    sb.append(hrData.get(hrKeyKey));
+                    sb.append(model.getHrData().get(hrKeyKey));
                     sb.append("</gpxtpx:hr>");
                     sb.append(LINE_END);
 
@@ -145,12 +144,12 @@ public class Workout {
 
         sb.append("<metadata>");
             sb.append("<time>");
-            sb.append(formatter.format(getStartTime()));
+            sb.append(formatter.format(model.getStartTime()));
             sb.append("</time>");
         sb.append("</metadata>");
 
         sb.append("<trk>");
-            sb.append("<name> workout("+ dateFormatter.format(getStartTime()) +") by "+ CREATOR +"</name>");
+            sb.append("<name> workout("+ dateFormatter.format(model.getStartTime()) +") by "+ CREATOR +"</name>");
             sb.append("<extensions>");
                 sb.append("<gpxtrx:TrackExtension>");
                 sb.append("<gpxtrx:DisplayColor>Black</gpxtrx:DisplayColor>");
@@ -195,10 +194,10 @@ public class Workout {
                 if (readstr.startsWith("<trkpt")) {
                     Coordinate cordinate = readCoordinate(gpxFile, idx);
                     if (cordinate.isOk())
-                        addCoordinate(cordinate);
+                        model.getCoordinateList().add(cordinate);
                 }
                 if (readstr.startsWith("<gpx")) {
-                    setStartTime(readStartTime(gpxFile, idx));
+                    model.setStartTime(readStartTime(gpxFile, idx));
                 }
             }
         } catch (Exception e) {
@@ -297,33 +296,15 @@ public class Workout {
     }
 
     public void addPulse(Integer pulse) {
-        this.hrData.put(index++, pulse);
+        model.getHrData().put(index++, pulse);
     }
 
-    public Map<Integer, Integer> getHrData() {
-        return hrData;
+    public WorkoutModel getModel() {
+        return model;
     }
 
-    public void addCoordinate(Coordinate coordinate) {
-        this.coordinateList.add(coordinate);
+    public void setModel(WorkoutModel model) {
+        this.model = model;
     }
-
-    public List<Coordinate> getCoordinateList() {
-        return coordinateList;
-    }
-
-    public void setCoordinateList(List<Coordinate> coordinateList) {
-        this.coordinateList = coordinateList;
-    }
-
-    public Date getStartTime() {
-        return startTime;
-    }
-
-    public void setStartTime(Date startTime) {
-        this.startTime = startTime;
-    }
-
-
 }
 
