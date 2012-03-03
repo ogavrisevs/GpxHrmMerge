@@ -5,11 +5,16 @@
 		  http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd"
          version="2.5">
 
+    <welcome-file-list>
+        <welcome-file>index.jsp</welcome-file>
+    </welcome-file-list>
+
+    <!--===============================================-->
+
     <servlet>
         <servlet-name>Upload</servlet-name>
         <servlet-class>com.bla.laa.server.Upload</servlet-class>
     </servlet>
-
     <servlet-mapping>
         <servlet-name>Upload</servlet-name>
         <url-pattern>/upload</url-pattern>
@@ -21,7 +26,6 @@
         <servlet-name>Download</servlet-name>
         <servlet-class>com.bla.laa.server.Download</servlet-class>
     </servlet>
-
     <servlet-mapping>
         <servlet-name>Download</servlet-name>
         <url-pattern>/download</url-pattern>

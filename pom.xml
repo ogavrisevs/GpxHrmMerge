@@ -1,0 +1,25 @@
+<project>
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>vienalga</groupId>
+    <artifactId>vienalga</artifactId>
+    <packaging>jar</packaging>
+    <version>1</version>
+    <name>aaa</name>
+    <url>http://maven.apache.org</url>
+    <!--
+    <dependencies>
+        <dependency>
+            <groupId>com.google.appengine</groupId>
+            <artifactId>appengine-api-stubs</artifactId>
+            <version>1.6.2.1</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.google.appengine</groupId>
+            <artifactId>appengine-testing</artifactId>
+            <version>1.6.2.1</version>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+    -->
+</project>
