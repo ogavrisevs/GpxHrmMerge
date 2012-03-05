@@ -20,7 +20,7 @@
         <a href="<%= tutorialUrl %>">tutorial</a>
         )
     </h3>
-    <form action="<%= blobstoreService.createUploadUrl("/upload") %>" method="post" enctype="multipart/form-data">
+    <form action="/upload" method="post" enctype="multipart/form-data">
         <label > Set *.gpx file : </label>
         <input type="file" name="gpxFile" class="gpxFile">
         <br>

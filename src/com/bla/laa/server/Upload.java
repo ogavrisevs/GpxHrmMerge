@@ -13,9 +13,15 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
+
+import org.apache.commons.fileupload.FileItemIterator;
+import org.apache.commons.fileupload.FileItemStream;
+import org.apache.commons.fileupload.servlet.ServletFileUpload;
 
 public class Upload extends HttpServlet {
     private static final Logger logger = Logger.getLogger(Upload.class.getName());
@@ -30,6 +36,10 @@ public class Upload extends HttpServlet {
         BlobKey gpxBlobKey = null;
         BlobKey hrmBlobKey = null;
         try{
+
+            //blobstoreService.getUploadedBlobs(request);
+            upload(req, res);
+
             Map<String, List<BlobKey>> blobs = blobstoreService.getUploads(req);
             gpxBlobKey = blobs.get("gpxFile").get(0);
             hrmBlobKey = blobs.get("hrmFile").get(0);
@@ -56,11 +66,12 @@ public class Upload extends HttpServlet {
 
             }
 
-        } catch (CustomException e) {
-            returnError(res, e.getMessage());
+        } catch (CustomException ce) {
+            returnError(res, ce.getMessage());
         } catch (Exception e) {
             logger.severe(e.getMessage());
             e.printStackTrace();
+            returnError(res, e.getMessage());
 
         } finally {
             if (gpxBlobKey != null){
@@ -85,5 +96,35 @@ public class Upload extends HttpServlet {
         res.sendError(404, " Error reading files ");
     }
 
+    public void upload(HttpServletRequest req, HttpServletResponse res)
+            throws ServletException, IOException {
+        try {
+            List<String> list = new ArrayList<String>();
+
+            ServletFileUpload upload = new ServletFileUpload();
+            res.setContentType("text/plain");
+
+            FileItemIterator iterator = upload.getItemIterator(req);
+            while (iterator.hasNext()) {
+                FileItemStream item = iterator.next();
+                InputStream stream = item.openStream();
+
+                if (item.isFormField()) {
+                    logger.warning("Got a form field: " + item.getFieldName());
+                } else {
+                    logger.warning("Got an uploaded file: " + item.getFieldName() + ", name = " + item.getName());
+
+                    int len;
+                    byte[] buffer = new byte[8192];
+                    while ((len = stream.read(buffer, 0, buffer.length)) != -1) {
+                        String msg = String.valueOf(buffer);
+                        list.add(msg);
+                    }
+                }
+            }
+        } catch (Exception ex) {
+            throw new ServletException(ex);
+        }
+    }
 }
 
