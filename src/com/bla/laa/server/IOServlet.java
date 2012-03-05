@@ -10,6 +10,7 @@ import com.google.appengine.api.files.FileWriteChannel;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.PrintWriter;
 import java.nio.channels.Channels;
 import java.util.ArrayList;
@@ -78,6 +79,28 @@ public class IOServlet {
 
         return list;
     }
+
+    public static List<String> readFile(InputStream stream){
+        List<String> list = new ArrayList<String>();
+        StringBuffer sb = new StringBuffer();
+        try{
+            int len;
+            byte[] buffer = new byte[8192];
+            while ((len = stream.read(buffer, 0, buffer.length)) != -1) {
+                String msg = new String(buffer);
+                sb.append(msg);
+            }
+
+            for (String str : sb.toString().split("\r\n"))
+                list.add(str);
+
+        } catch(Exception e){
+            logger.severe(e.getMessage());
+            e.printStackTrace();
+        }
+        return list;
+    }
+
 
 }
 
