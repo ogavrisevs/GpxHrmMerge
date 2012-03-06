@@ -71,7 +71,7 @@ public class Upload extends HttpServlet {
     }
 
     public void getUploaded(HttpServletRequest req, HttpServletResponse res)
-            throws ServletException, IOException {
+            throws ServletException, IOException, CustomException {
         try {
             List<String> list = new ArrayList<String>();
 
@@ -93,8 +93,17 @@ public class Upload extends HttpServlet {
                         hrmFile = IOServlet.getInstance().readFile(stream);
                 }
             }
-        } catch (Exception ex) {
-            throw new ServletException(ex);
+
+            if ((gpxFile == null) || (gpxFile.size() == 0))
+                throw  new CustomException("Wrong gpx file");
+
+            if ((hrmFile == null) || (hrmFile.size() == 0))
+                throw  new CustomException("Wrong hrm file");
+
+        } catch (CustomException ce) {
+            throw ce;
+        } catch (Exception e) {
+            throw new ServletException(e);
         }
     }
 }

@@ -80,12 +80,12 @@ public class IOServlet {
         return list;
     }
 
-    public static List<String> readFile(InputStream stream){
+    public static List<String> readFile(InputStream stream) throws CustomException {
         List<String> list = new ArrayList<String>();
         StringBuffer sb = new StringBuffer();
         try{
             int len;
-            byte[] buffer = new byte[8192];
+            byte[] buffer = new byte[1];
             while ((len = stream.read(buffer, 0, buffer.length)) != -1) {
                 String msg = new String(buffer);
                 sb.append(msg);
@@ -99,10 +99,11 @@ public class IOServlet {
                 str = str.trim();
                 list.add(str);
             }
-
             if (list.size() == 0)
-                new CustomException("File empty !");
+                throw  new CustomException("File empty !");
 
+        }catch (CustomException ce){
+            throw ce;
         } catch(Exception e){
             logger.severe(e.getMessage());
             e.printStackTrace();

@@ -26,6 +26,10 @@ public class Workout {
 
     private static Integer index = 1;
 
+    public Workout() {
+        Workout.index = 1;
+    }
+
     public void sort(){
         Collections.sort(model.getCoordinateList());
     }
@@ -36,19 +40,38 @@ public class Workout {
         if ((model.getCoordinateList().size() == 0) || (model.getHrData().size() == 0))
             throw  new CustomException();
 
-        while (model.getCoordinateList().size() > model.getHrData().size()){
+        Set<Integer> coorKeySet = model.getHrData().keySet();
+        Object coorKeys[] = coorKeySet.toArray();
+
+        Set<Integer> hrKeySet = model.getHrData().keySet();
+        Object hrKeys[] = hrKeySet.toArray();
+
+        if (coorKeys.length > hrKeys.length){
             int keyCount = model.getCoordinateList().size();
-            model.getCoordinateList().remove(random.nextInt(keyCount));
+
+            while (coorKeys.length > hrKeys.length){
+                int randInt = random.nextInt(keyCount);
+                Object key = coorKeys[randInt];
+                model.getCoordinateList().remove(key);
+            }
         }
-        while (model.getCoordinateList().size() < model.getHrData().size()){
-            int keyCount = model.getCoordinateList().size();
-            model.getHrData().remove(random.nextInt(keyCount));
+
+        if (coorKeys.length < hrKeys.length){
+            int keyCount = model.getHrData().size();
+
+            while (coorKeys.length < hrKeys.length){
+                int randInt = random.nextInt(keyCount);
+                Object key = hrKeys[randInt];
+                model.getHrData().remove(key);
+            }
         }
     }
 
     public void printSummary(){
-        logger.info("coordinateList("+ model.getCoordinateList().size()+ ")");
-        logger.info("hrData("+ model.getHrData().size() +")");
+        StringBuffer sb  = new StringBuffer();
+        sb.append("coordinateList(" + model.getCoordinateList().size() + ") ,  ");
+        sb.append("hrData("+ model.getHrData().size() +")");
+        logger.info( sb.toString() );
     }
 
     public void print(){
@@ -183,7 +206,7 @@ public class Workout {
                 if ((!startOfHRdata) && (readString.contains("[HRData]")))
                     startOfHRdata = Boolean.TRUE;
             }
-            if (hrmFile.size() == 0)
+            if (model.getHrData().size() == 0)
                 throw new CustomException("Cannot parse Hrm file !");
         }catch (CustomException ce ){
             throw ce;
@@ -206,7 +229,7 @@ public class Workout {
                     model.setStartTime(readStartTime(gpxFile, idx));
                 }
             }
-            if (gpxFile.size() == 0)
+            if (model.getCoordinateList().size() == 0)
                 throw new CustomException("Cannot parse Gpx file !");
         } catch (CustomException ce ){
             // do nothing!
