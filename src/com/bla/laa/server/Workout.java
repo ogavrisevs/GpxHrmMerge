@@ -165,7 +165,8 @@ public class Workout {
         sb.append("</gpx>");
     }
 
-    public void readHrmFile(List<String> hrmFile) throws CustomException {
+    public void parseHrmFile(List<String> hrmFile) throws CustomException {
+        logger.info("parseHrmFile()");
         try {
             Boolean startOfHRdata = false;
             for(String readString : hrmFile){
@@ -173,21 +174,26 @@ public class Workout {
 
                 if (startOfHRdata) {
                     String pulseStr = readString.split("\t")[0];
-                    if (!pulseStr.isEmpty())
-                        addPulse(Integer.valueOf(pulseStr));
+                    if (!pulseStr.isEmpty()){
+                        Integer pulse = parsePulse(pulseStr);
+                        addPulse(pulse);
+                    }
                 }
 
                 if ((!startOfHRdata) && (readString.contains("[HRData]")))
                     startOfHRdata = Boolean.TRUE;
             }
+            if (hrmFile.size() == 0)
+                throw new CustomException("Cannot parse Hrm file !");
+        }catch (CustomException ce ){
+            throw ce;
         }catch (Exception e){
             e.printStackTrace();
         }
-        if (hrmFile.size() == 0)
-            throw new CustomException("Cannot parse Hrm file !");
     }
 
-    public void readGpxFile(List<String> gpxFile) throws CustomException {
+    public void parseGpxFile(List<String> gpxFile) throws CustomException {
+        logger.info("parseGpxFile()");
         try {
             for (int idx = 0; idx < gpxFile.size(); idx++) {
                 String readstr = gpxFile.get(idx).trim();
@@ -200,12 +206,14 @@ public class Workout {
                     model.setStartTime(readStartTime(gpxFile, idx));
                 }
             }
+            if (gpxFile.size() == 0)
+                throw new CustomException("Cannot parse Gpx file !");
+        } catch (CustomException ce ){
+            // do nothing!
+            throw ce;
         } catch (Exception e) {
             e.printStackTrace();
         }
-        if (gpxFile.size() == 0)
-            throw new CustomException("Cannot parse Gpx file !");
-
     }
 
     public Date readStartTime(List<String> gpxFile,int idx) throws ParseException {
@@ -215,11 +223,13 @@ public class Workout {
         while(true){
             if (readString.startsWith("<time")){
                 String timestampStr = getTagVal(readString, "time");
-                dt = df.parse(timestampStr);
+                dt = parseDate(timestampStr);
             }
             if (readString.contains("<trkpt>"))
                 break;
             if ((idx+1) >= gpxFile.size())
+                break;
+            if (dt != null)
                 break;
             readString = gpxFile.get(++idx).trim();
             if ((readString == null) || (readString.isEmpty()))
@@ -234,12 +244,16 @@ public class Workout {
         readString = gpxFile.get(idx);
         while(true){
             if (readString.startsWith("<trkpt") && cordinate.getLatitude().isEmpty() && cordinate.getLongitude().isEmpty()){
-                cordinate.setLatitude(getCleanVal(getAtribValue(readString, "lat")));
-                cordinate.setLongitude(getCleanVal(getAtribValue(readString, "lon")));
+                String readStringCopy = new String(readString);
+                String latitude = getCleanVal(getAtribValue(readStringCopy, "lat"));
+                cordinate.setLatitude(latitude);
+                String longitude = getCleanVal(getAtribValue(readStringCopy, "lon"));
+                cordinate.setLongitude(longitude);
             }
             if (readString.startsWith("<time") && cordinate.getTimeStamp() == null){
+                String readStringCopy = new String(readString);
                 String timestampStr = getTagVal(readString, "time");
-                Date dt = df.parse(timestampStr);
+                Date dt = parseDate(timestampStr);
                 cordinate.setTimeStamp(dt);
             }
             if (readString.contains("</trkpt>"))
@@ -293,6 +307,29 @@ public class Workout {
                 endStr += ch;
         }
         return endStr;
+    }
+
+    private Integer parsePulse(String pulseStr) {
+        Integer  rez = 0;
+        try{
+           rez = Integer.valueOf(pulseStr);
+        }catch (NumberFormatException nfe){
+            logger.severe("Unable to pares : "+ pulseStr);
+            logger.severe(nfe.getMessage());
+        }
+        return rez;
+    }
+
+    private Date parseDate(String dateStr) throws ParseException {
+        Date dt = null;
+        try{
+           dt = df.parse(dateStr);
+        }catch (ParseException pe ){
+            logger.severe("Unable to pares : "+ dateStr);
+            logger.severe(pe.getMessage());
+            throw pe;
+        }
+        return dt;
     }
 
     public void addPulse(Integer pulse) {

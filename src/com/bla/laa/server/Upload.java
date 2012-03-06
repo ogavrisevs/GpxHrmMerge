@@ -35,10 +35,9 @@ public class Upload extends HttpServlet {
 
         try{
             getUploaded(req, res);
-
             Workout workout = new Workout();
-            workout.readGpxFile(gpxFile);
-            workout.readHrmFile(hrmFile);
+            workout.parseGpxFile(gpxFile);
+            workout.parseHrmFile(hrmFile);
             workout.printSummary();
             workout.normalize();
             workout.printSummary();
@@ -52,7 +51,6 @@ public class Upload extends HttpServlet {
                 //rd.forward(req, res);
                 res.sendRedirect(url);
                 logger.info(model.getKey().toString());
-
             }
 
         } catch (CustomException ce) {
