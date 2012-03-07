@@ -91,19 +91,16 @@ public class IOServlet {
                 sb.append(msg);
             }
 
-            for (String str : sb.toString().split("\n")){
-                if (str.length() > 100)
-                    str.trim(); // \u0000\u0000\u0000\.
+            if (sb.toString().length() != 0){
+                for (String str : sb.toString().split("\n")){
+                    if (str.length() > 100)
+                        str.trim(); // \u0000\u0000\u0000\.
 
-                str = str.replace("\r", "");
-                str = str.trim();
-                list.add(str);
+                    str = str.replace("\r", "");
+                    str = str.trim();
+                    list.add(str);
+                }
             }
-            if (list.size() == 0)
-                throw  new CustomException("File empty !");
-
-        }catch (CustomException ce){
-            throw ce;
         } catch(Exception e){
             logger.severe(e.getMessage());
             e.printStackTrace();

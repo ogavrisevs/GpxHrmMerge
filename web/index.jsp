@@ -20,6 +20,10 @@
         <a href="<%= tutorialUrl %>">tutorial</a>
         )
     </h3>
+
+    <div>${userMessage}</div>
+    <div style="color:red">${errorMessage}</div>
+
     <form action="/upload" method="post" enctype="multipart/form-data">
         <label > Set *.gpx file : </label>
         <input type="file" name="gpxFile" class="gpxFile">

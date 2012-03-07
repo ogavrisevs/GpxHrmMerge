@@ -1,6 +1,7 @@
 package com.bla.laa.server;
 
 import com.bla.laa.server.exception.CustomException;
+import com.bla.laa.server.exception.ExceptionWithMessage;
 import com.google.appengine.api.blobstore.BlobstoreService;
 import com.google.appengine.api.blobstore.BlobstoreServiceFactory;
 import com.google.appengine.api.files.FileService;
@@ -16,6 +17,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
@@ -55,6 +57,8 @@ public class Upload extends HttpServlet {
 
         } catch (CustomException ce) {
             returnError(res, ce.getMessage());
+        } catch (ExceptionWithMessage cwm) {
+            req.setAttribute("errorMessage", cwm.getMessage()); 
         } catch (Exception e) {
             logger.severe(e.getMessage());
             e.printStackTrace();
@@ -70,8 +74,12 @@ public class Upload extends HttpServlet {
         res.sendError(404, " Error reading files ");
     }
 
+    public void returnErrorMessage(HttpServletResponse res, HttpServletRequest req, String message) throws IOException {
+        req.setAttribute("errorMessage", message);
+    }
+
     public void getUploaded(HttpServletRequest req, HttpServletResponse res)
-            throws ServletException, IOException, CustomException {
+            throws ServletException, IOException, CustomException, ExceptionWithMessage {
         try {
             List<String> list = new ArrayList<String>();
 
@@ -95,13 +103,13 @@ public class Upload extends HttpServlet {
             }
 
             if ((gpxFile == null) || (gpxFile.size() == 0))
-                throw  new CustomException("Wrong gpx file");
+                throw  new ExceptionWithMessage("Empty gpx file");
 
             if ((hrmFile == null) || (hrmFile.size() == 0))
-                throw  new CustomException("Wrong hrm file");
+                throw  new ExceptionWithMessage("Empty hrm file");
 
-        } catch (CustomException ce) {
-            throw ce;
+        } catch (ExceptionWithMessage ewm) {
+            throw ewm;
         } catch (Exception e) {
             throw new ServletException(e);
         }
