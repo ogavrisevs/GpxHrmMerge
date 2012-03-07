@@ -1,8 +1,10 @@
 .gpxFile {
-    width: 300px;
+    width: 420px;
     margin:5px auto 5px;
+    margin-left: 10px;
 }
 .hrmFile {
-    width: 300px;
+    width: 420px;
     margin:5px auto 5px;
+    margin-left: 10px;
 }

@@ -2,7 +2,6 @@
 <%@ page import="com.google.appengine.api.blobstore.BlobstoreService" %>
 
 <%
-    BlobstoreService blobstoreService = BlobstoreServiceFactory.getBlobstoreService();
     String tutorialUrl = "http://"+  request.getServerName() +":"+ request.getServerPort() +"/Tutorial.jsp";
 %>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
@@ -12,9 +11,9 @@
       <link rel="stylesheet" href="main.css">
   </head>
   <body>
-    <h3> Merge your workout data (heart rate and gpx track) from
+    <h3> Merge your
          <a href="http://www.polar.fi/en/products/maximize_performance/running_multisport/RS800CX">polar</a>
-        sport clock to import into
+        sport clock workout data (heart rate and gpx track) for import into
         <a href="http://www.endomondo.com">endomondo.com</a>
         site ( read
         <a href="<%= tutorialUrl %>">tutorial</a>
@@ -25,11 +24,11 @@
     <div style="color:red">${errorMessage}</div>
 
     <form action="/upload" method="post" enctype="multipart/form-data">
-        <label > Set *.gpx file : </label>
-        <input type="file" name="gpxFile" class="gpxFile">
+        <label > Set gpx file  :  </label>
+        <input type="file" name="gpxFile" class="gpxFile" size="50">
         <br>
-        <label > Set *.hrm file : </label>
-        <input type="file" name="hrmFile" class="hrmFile">
+        <label > Set hrm file  :  </label>
+        <input type="file" name="hrmFile" class="hrmFile" size="50">
         <input type="submit" value="Merge Files">
     </form>
   </body>

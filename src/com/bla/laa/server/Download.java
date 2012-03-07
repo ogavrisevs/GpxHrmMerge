@@ -4,6 +4,7 @@ import com.google.appengine.api.datastore.Key;
 import com.google.appengine.api.datastore.KeyFactory;
 
 import javax.jdo.PersistenceManager;
+import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServlet;
@@ -34,9 +35,11 @@ public class Download extends HttpServlet {
             Workout workout = new Workout();
             workout.setModel(model);
             printRez(workout, response, request);
-
-        } else
-            printBack( response, request);
+        } else {
+            RequestDispatcher rd = request.getRequestDispatcher("index.jsp");
+            rd.forward(request, response);
+            //printBack(response, request);
+        }
 
     }
 

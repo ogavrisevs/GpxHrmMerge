@@ -1,6 +1,7 @@
 package com.bla.laa.server;
 
 import com.bla.laa.server.exception.CustomException;
+import com.bla.laa.server.exception.ExceptionWithMessage;
 
 import java.text.DateFormat;
 import java.text.ParseException;
@@ -188,7 +189,7 @@ public class Workout {
         sb.append("</gpx>");
     }
 
-    public void parseHrmFile(List<String> hrmFile) throws CustomException {
+    public void parseHrmFile(List<String> hrmFile) throws CustomException, ExceptionWithMessage {
         logger.info("parseHrmFile()");
         try {
             Boolean startOfHRdata = false;
@@ -207,15 +208,16 @@ public class Workout {
                     startOfHRdata = Boolean.TRUE;
             }
             if (model.getHrData().size() == 0)
-                throw new CustomException("Cannot parse Hrm file !");
-        }catch (CustomException ce ){
-            throw ce;
+                throw new ExceptionWithMessage("Cannot parse Hrm file !");
+
+        } catch (ExceptionWithMessage cwm ){
+            throw cwm;
         }catch (Exception e){
             e.printStackTrace();
         }
     }
 
-    public void parseGpxFile(List<String> gpxFile) throws CustomException {
+    public void parseGpxFile(List<String> gpxFile) throws CustomException, ExceptionWithMessage {
         logger.info("parseGpxFile()");
         try {
             for (int idx = 0; idx < gpxFile.size(); idx++) {
@@ -230,10 +232,10 @@ public class Workout {
                 }
             }
             if (model.getCoordinateList().size() == 0)
-                throw new CustomException("Cannot parse Gpx file !");
-        } catch (CustomException ce ){
-            // do nothing!
-            throw ce;
+                throw new ExceptionWithMessage("Cannot parse Gpx file !");
+
+        } catch (ExceptionWithMessage cwm ){
+            throw cwm;
         } catch (Exception e) {
             e.printStackTrace();
         }

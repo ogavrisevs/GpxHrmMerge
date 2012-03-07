@@ -11,13 +11,13 @@ import org.apache.commons.fileupload.FileItemStream;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 
 import javax.jdo.PersistenceManager;
+import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
@@ -30,6 +30,14 @@ public class Upload extends HttpServlet {
 
     List<String> gpxFile = null;
     List<String> hrmFile = null;
+
+    @Override
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        logger.info("Upload.doGet()");
+        RequestDispatcher rd = req.getRequestDispatcher("index.jsp");
+        rd.forward(req, resp);
+        logger.info("forward -> index.jsp");
+    }
 
     public void doPost(HttpServletRequest req, HttpServletResponse res)
             throws ServletException, IOException {
@@ -49,16 +57,23 @@ public class Upload extends HttpServlet {
                 pm.makePersistent(model);
 
                 String url = "http://"+  req.getServerName() +":"+ req.getServerPort() +"/download?id="+ model.getKey().getId();
-                //RequestDispatcher rd = req.getRequestDispatcher(url);
+                req.removeAttribute("errorMessage");
+
+                //request.setAttribute("areas", areas);
+                //RequestDispatcher rd = req.getRequestDispatcher("download?id="+ model.getKey().getId());
                 //rd.forward(req, res);
+
                 res.sendRedirect(url);
-                logger.info(model.getKey().toString());
+                logger.info("redirect -> /download?id="+ model.getKey().getId());
             }
 
         } catch (CustomException ce) {
             returnError(res, ce.getMessage());
         } catch (ExceptionWithMessage cwm) {
-            req.setAttribute("errorMessage", cwm.getMessage()); 
+            req.setAttribute("errorMessage", cwm.getMessage());
+            RequestDispatcher rd = req.getRequestDispatcher("index.jsp");
+            rd.forward(req,res);
+            logger.info("forward -> index.jsp");
         } catch (Exception e) {
             logger.severe(e.getMessage());
             e.printStackTrace();

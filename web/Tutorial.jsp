@@ -7,11 +7,11 @@
     <h3> Tutorial </h3>
     <h4> 1. Import your data from sport clock to Pc (use :
         <a href="http://www.polar.fi/en/products/training_software"> Polar ProTrainer5</a>
-        )
+        ).
     </h4>
     <img src="\img\Transfere.png" alt="some_text"/>
 
-    <h4> 2. Find imported files on PC (where "user name" is your Windows user)</h4>
+    <h4> 2. Find imported files on PC (where "user name" is your Windows user).</h4>
     <img src="\img\FilesonPc.png" alt="some_text"/>
 
     <h4> 3. Go to
@@ -20,14 +20,22 @@
     </h4>
     <img src="\img\UploadF.png" alt="some_text"/>
 
-    <h4> 4. Save mergeet file on PC </h4>
+    <h4> 4. Save merged file on PC. </h4>
     <h4> 5. Goto  :  <a href="http://www.endomondo.com">endomondo.com</a>
         and login.
     </h4>
-    <h4> 6. Chose : Workouts ->  Import Workout -> Import from file </h4>
+    <h4> 6. Chose: Workouts ->  Import Workout -> Import from file. </h4>
     <img src="\img\EndoUpload.png" alt="some_text"/>
 
-    <h4> 7. Choose and upload merget workout gpx file  </h4>
+    <h4> 7. Choose and upload merged workout gpx file. </h4>
+    <img src="\img\EndoUploadSelect.png" alt="some_text"/>
+
+    <h4> 8. Save imported workout.</h4>
+    <img src="\img\EndoUploadOk.png" alt="some_text"/>
+
+    <h4> 9. View your workout.</h4>
+    <img src="\img\EndoEnd.png" alt="some_text"/>
+
 
 </body>
 </html>
