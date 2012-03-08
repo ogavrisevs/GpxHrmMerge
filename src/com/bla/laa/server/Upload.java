@@ -24,6 +24,7 @@ import java.util.logging.Logger;
 
 public class Upload extends HttpServlet {
     private static final Logger logger = Logger.getLogger(Upload.class.getName());
+    protected static final String WORKOUT = "workout";
     private BlobstoreService blobstoreService = BlobstoreServiceFactory.getBlobstoreService();
     FileService fileService = FileServiceFactory.getFileService();
     PersistenceManager pm = PMF.get().getPersistenceManager();
@@ -54,17 +55,10 @@ public class Upload extends HttpServlet {
 
             if ( !workout.getModel().getCoordinateList().isEmpty() && !workout.getModel().getHrData().isEmpty()){
                 WorkoutModel model = workout.getModel();
-                pm.makePersistent(model);
-
-                String url = "http://"+  req.getServerName() +":"+ req.getServerPort() +"/download?id="+ model.getKey().getId();
-                req.removeAttribute("errorMessage");
-
-                //request.setAttribute("areas", areas);
-                //RequestDispatcher rd = req.getRequestDispatcher("download?id="+ model.getKey().getId());
-                //rd.forward(req, res);
-
+                getServletContext().setAttribute(WORKOUT, workout);
+                String url = "http://"+  req.getServerName() +":"+ req.getServerPort() +"/download";
                 res.sendRedirect(url);
-                logger.info("redirect -> /download?id="+ model.getKey().getId());
+                logger.info("redirect -> /download");
             }
 
         } catch (CustomException ce) {

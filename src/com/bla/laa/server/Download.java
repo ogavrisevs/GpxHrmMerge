@@ -28,17 +28,15 @@ public class Download extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         logger.info("Download.doGet()");
 
-        String workoutKey = request.getParameter("id");
-        if (workoutKey != null){
-            Key key = KeyFactory.createKey(WorkoutModel.class.getSimpleName(), Integer.valueOf(workoutKey));
-            WorkoutModel model = (WorkoutModel) PMF.getByKey(WorkoutModel.class, key);
-            Workout workout = new Workout();
-            workout.setModel(model);
+        Object workoutObj = getServletContext().getAttribute(Upload.WORKOUT);
+        if (workoutObj != null){
+            getServletContext().removeAttribute(Upload.WORKOUT);
+            Workout workout = (Workout) workoutObj;
             printRez(workout, response, request);
         } else {
             RequestDispatcher rd = request.getRequestDispatcher("index.jsp");
             rd.forward(request, response);
-            //printBack(response, request);
+            logger.info("Forward -> index.jsp");
         }
 
     }
