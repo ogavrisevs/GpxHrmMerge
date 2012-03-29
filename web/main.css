@@ -1,3 +1,14 @@
+input[type="file"]{
+  border-right: #a9a9a9 1px solid;
+  padding-right: 4px;
+  border-top: #a9a9a9 1px solid;
+  padding-left: 4px;
+  padding-bottom: 4px;
+  border-left: #a9a9a9 1px solid;
+  padding-top: 4px;
+  border-bottom: #a9a9a9 1px solid;
+}
+
 .gpxFile {
     width: 420px;
     margin:5px auto 5px;
@@ -8,3 +19,22 @@
     margin:5px auto 5px;
     margin-left: 10px;
 }
+
+body {
+    background: #728eaB;
+	background: -moz-linear-gradient(left, #25303D, #728EAB );
+    background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#25303D), color-stop(100%,#728EAB));
+	font-family: sans-serif;
+}
+
+
+.center {
+	width : 650px;
+    margin : 60px auto;
+    padding: 60px 30px;
+	background: #c9d0dF; border: 1px solid #e1e1e1;
+	-moz-box-shadow: 0px 0px 8px #444; -webkit-box-shadow: 0px 0px 8px #444;
+    border-radius: 5px; -moz-border-radius: 5px; -webkit-border-radius: 5px;
+}
+
+

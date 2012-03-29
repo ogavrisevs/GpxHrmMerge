@@ -116,32 +116,26 @@ public class Workout {
             sb.append("\">");
             sb.append(LINE_END);
 
-            /*
-                sb.append("<ele>");
-                sb.append(String.valueOf(coordinate.getElevation()));
-                sb.append("</ele>");
-                sb.append(LINE_END);
-             */
-                sb.append("<time>");
+                sb.append("  <time>");
                 sb.append(formatter.format(coordinate.getTimeStamp()));
                 sb.append("</time>");
                 sb.append(LINE_END);
 
-                sb.append("<extensions>");
+                sb.append("  <extensions>");
                 sb.append(LINE_END);
 
-                    sb.append("<gpxtpx:TrackPointExtension>");
+                    sb.append("    <gpxtpx:TrackPointExtension>");
                     sb.append(LINE_END);
 
-                    sb.append("<gpxtpx:hr>");
-                    sb.append(model.getHrData().get(hrKeyKey));
+                    sb.append("      <gpxtpx:hr>");
+                    sb.append((model.getHrData().get(hrKeyKey)));
                     sb.append("</gpxtpx:hr>");
                     sb.append(LINE_END);
 
-                    sb.append("</gpxtpx:TrackPointExtension>");
+                    sb.append("    </gpxtpx:TrackPointExtension>");
                     sb.append(LINE_END);
 
-                sb.append("</extensions>");
+                sb.append("  </extensions>");
                 sb.append(LINE_END);
 
             sb.append("</trkpt>");
@@ -197,7 +191,13 @@ public class Workout {
                 readString = readString.trim();
 
                 if (startOfHRdata) {
-                    String pulseStr = readString.split("\t")[0];
+                    String splitStr[] = readString.split("\t");
+                    if (splitStr.length == 1)
+                        throw new ExceptionWithMessage("Wrong Hrm file, try hrm file with bigest size !!!");
+                    if (splitStr.length < 4)
+                        throw new ExceptionWithMessage("Cannot parse Hrm file !");
+
+                    String pulseStr = splitStr[0];
                     if (!pulseStr.isEmpty()){
                         Integer pulse = parsePulse(pulseStr);
                         addPulse(pulse);
