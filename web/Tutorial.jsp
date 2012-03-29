@@ -16,7 +16,7 @@
 
     <h4> 3. Go to
     <a href="http://polarmrg.appspot.com"> PolarMrg site </a>
-        and upload gpx and hrm files ( there will be two hrm files ! chose file with smallest size ).
+        and upload gpx and hrm files ( there will be two hrm files ! chose file with biggest size ).
     </h4>
     <img src="\img\UploadF.png" alt="some_text"/>
 
